@@ -3,4 +3,4 @@ project(PEA_zad1)
 
 set(CMAKE_CXX_STANDARD 23)
 
-add_executable(PEA_zad1 main.cpp Graph.cpp Graph.h)
+add_executable(PEA_zad1 main.cpp Graph.cpp Graph.h TimeTest.cpp TimeTest.h)

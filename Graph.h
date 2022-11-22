@@ -6,6 +6,7 @@
 #define PEA_ZAD1_GRAPH_H
 
 #include <string>
+#include "vector"
 
 using namespace std;
 /**
@@ -20,9 +21,32 @@ public:
     int ** matrix;
 
 
+    void generateRandomMatrix(int userSize);
+
+    void dpInit();
+
+    void startDynamicProgramming();
+
     bool readFromFile(string filename);
     void printMatrix();
     void bruteForce();
+
+    void printResult();
+
+    Graph();
+    ~Graph();
+
+private:
+    int dynamicProgramming(int nodeIndex, int nodeBits);
+    void dpCountPath(int nodeIndex, int nodeBits);
+
+    int cost;
+
+    int ** dpTemp;
+    vector<int> path;
+    int bits;
+    int ** dpDivisions;
+    int ** dpTrack;
 };
 
 

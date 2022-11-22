@@ -1,5 +1,6 @@
 #include <iostream>
 #include "Graph.h"
+#include "TimeTest.h"
 
 using namespace std;
 
@@ -24,6 +25,7 @@ bool mainMenu(Graph *g){
     cout << "[1] Wczytaj dane z pliku" << endl;
     cout << "[2] Wyswietl reprezentacje grafu" << endl;
     cout << "[3] Rozpocznij algorytm Brute Force" << endl;
+    cout << "[4] Rozpocznij algorytm Dynamic Programming" << endl;
 
     cout << endl << "Twoj wybor: ";
     cin >> choice;
@@ -34,6 +36,7 @@ bool mainMenu(Graph *g){
         case '1': {readFromFile(g); break;}
         case '2': {g->printMatrix(); break;}
         case '3': {g->bruteForce(); break;}
+        case '4': {g->dpInit(); g->startDynamicProgramming(); g->printResult(); break;}
         default: cout << "Blad wyboru!" << endl;
     }
     return true;
@@ -41,15 +44,18 @@ bool mainMenu(Graph *g){
 
 int main() {
 
+
+    TimeTest timeTest;
+    timeTest.runTest(1000, 11, 1);
     /*Graph g;
     if(!g.readFromFile("../tsp_13.txt"))
         cout << "Blad odczytu pliku!";
     else
         g.printMatrix();
     cout << endl << endl;
-
-    g.bruteForce();*/
-    Graph g;
-    while(mainMenu(&g));
+    */
+    //Graph g;
+    //while(mainMenu(&g));
+    //return 0;
     return 0;
 }

@@ -6,6 +6,7 @@
 #include <vector>
 #include "Graph.h"
 #include "fstream"
+#include "time.h"
 using namespace std;
 /**
  * Funkcja wczytuje macierz z pliku do reprezentacji macierzy wag w postaci dynamicznej tablicy dwuwymiarowej
@@ -45,6 +46,8 @@ bool Graph::readFromFile(string filename) {
     //wystapil blad odczytu
     return false;
 }
+
+
 /**
  * Funkcja wyswietla reprezentacje macierzow kosztow grafu
  */
@@ -69,6 +72,8 @@ void Graph::bruteForce() {
     vector<int> permutation;
     vector<int> bestPath;
     int minPathValue = INT_MAX, currPathValue = 0;
+
+
 
     for(int i = 0; i < size; i++) {
         // przypisanie po kolei indeksow wierzcholkow
@@ -95,9 +100,165 @@ void Graph::bruteForce() {
     } while (next_permutation(std::next(permutation.begin()), permutation.end()));
 
     // wypisanie wynikow
-    cout << "Najmniejsza suma wag: " << minPathValue << endl;
+    cost = minPathValue;
+    path = bestPath;
+
+    /*cout << "Najmniejsza suma wag: " << minPathValue << endl;
     for(int j: bestPath)
         cout << j << " -> ";
-    cout << "0" << endl;
+    cout << "0" << endl;*/
 
 }
+
+void Graph::dpInit() {
+    cost = 0;
+    dpTemp = new int *[size];
+    for (int i = 0; i < size; i++) {
+        dpTemp[i] = new int[size];
+    }
+
+
+    for (int i = 0; i < size; ++i) {
+        for (int j = 0; j < size; ++j) {
+            dpTemp[i][j] = matrix[i][j];
+        }
+    }
+
+    bits = 1 << size;
+
+    dpDivisions = new int *[size];
+    for (int i = 0; i < size; i++) {
+        dpDivisions[i] = new int[bits];
+    }
+
+    for (int i = 0; i < size; ++i) {
+        for (int j = 0; j < bits; ++j) {
+            dpDivisions[i][j] = -1;
+        }
+    }
+
+
+    dpTrack = new int *[size];
+    for (int i = 0; i < size; i++) {
+        dpTrack[i] = new int[bits];
+    }
+
+    for (int i = 0; i < size; ++i) {
+        for (int j = 0; j < bits; ++j) {
+            dpTrack[i][j] = -1;
+        }
+    }
+}
+
+int Graph::dynamicProgramming(int nodeIndex, int nodeBits) {
+    int result = -1;
+
+    if(dpDivisions[nodeIndex][nodeBits] != -1)
+        return dpDivisions[nodeIndex][nodeBits];
+
+    for (int i = 0; i < size; i++) {
+        int mask = bits - (1 << i);
+
+        int masked = nodeBits & mask;
+
+        if(masked != nodeBits) {
+            int value = dpTemp[nodeIndex][i] + dynamicProgramming(i, masked);
+
+            if(result == -1 || value < result) {
+                result = value;
+                dpTrack[nodeIndex][nodeBits] = i;
+            }
+        }
+    }
+
+    dpDivisions[nodeIndex][nodeBits] = result;
+    return result;
+}
+
+void Graph::dpCountPath(int nodeIndex, int nodeBits) {
+    path.push_back(0);
+    int x = dpTrack[nodeIndex][nodeBits];
+
+    while (x != -1) {
+        path.push_back(x);
+        int mask = bits - (1 << x);
+        int masked = nodeBits & mask;
+
+        x = dpTrack[x][masked];
+        nodeBits = masked;
+    }
+    path.push_back(0);
+}
+
+void Graph::startDynamicProgramming() {
+    bits--;
+
+    for(int i = 0; i < size; ++i) {
+        dpDivisions[i][0] = dpTemp[i][0];
+    }
+
+    cost = dynamicProgramming(0, bits - 1);
+    dpCountPath(0, bits - 1);
+}
+
+void Graph::printResult() {
+
+    cout << "Najkrotsza sciezka: ";
+    for (int i = 0; i < path.size() - 1; ++i) {
+        cout << path[i] << " -> ";
+    }
+    cout << path[path.size() - 1] << endl;
+    cout << "Minimalny koszt: " << cost << endl;
+
+
+    for (int i = 0; i < size; ++i) {
+        delete[] dpDivisions[i];
+        delete[] dpTemp[i];
+        delete[] dpTrack[i];
+    }
+    delete[] dpDivisions;
+    delete[] dpTemp;
+    delete[] dpTrack;
+    path.clear();
+}
+
+Graph::Graph() {
+
+}
+
+Graph::~Graph() {
+    /*for (int i = 0; i < size; ++i) {
+        delete[] dpDivisions[i];
+        delete[] dpTemp[i];
+        delete[] dpTrack[i];
+        delete[] matrix[i];
+    }
+    delete[] dpDivisions;
+    delete[] dpTemp;
+    delete[] dpTrack;
+    delete[] matrix;*/
+}
+
+void Graph::generateRandomMatrix(int userSize) {
+    this->size = userSize;
+
+    srand(time(NULL));
+
+    matrix = new int *[size];
+    for (int i = 0; i < size; ++i) {
+        matrix[i] = new int [size];
+    }
+
+    for (int i = 0; i < size; ++i) {
+        for (int j = 0; j < size; ++j) {
+            if(i != j)
+                matrix[i][j] = rand() % 99 + 1;
+            else
+                matrix[i][j] = 0;
+        }
+
+    }
+}
+
+
+
