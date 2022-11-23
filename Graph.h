@@ -16,10 +16,10 @@ using namespace std;
  * @param cost - uzyskany przez algorytm najnizszy koszt przejscia
  * @param path - uzyskana przez algorytm sciezka o najnizszym koszcie przejscia
  *
- * @param bits -
- * @param dpTemp -
- * @param dpDivisions -
- * @param dpTrack -
+ * @param bits - reprezentuje wierzcholki jako bity o odpowiednich indeksach. 1 - nierozpatrzony
+ * @param dpTemp - reprezentuje macierz dla algorytmu DP
+ * @param dpDivisions - reprezentuje macierz podproblemow
+ * @param dpTrack - reprezentuje macierz przejsc
  */
 class Graph {
 public:

@@ -113,9 +113,17 @@ void Graph::bruteForce() {
 }
 /**
  * Funkcja inicjalizuje niezbędne dane do przeprowadzenia algorytmu Dynamic Programming
+ * cost = 0
+ * dpTemp - wypelnione danymi z matrix
+ * bits = 1 na miejscu o 1 dalszym niz ilosc miast
+ * dpDivisions - wypelnione -1
+ * dpTrack - wypelnione -1
 **/
 void Graph::dpInit() {
     cost = 0;
+
+    bits = 1 << size;
+
     dpTemp = new int *[size];
     for (int i = 0; i < size; i++) {
         dpTemp[i] = new int[size];
@@ -128,7 +136,6 @@ void Graph::dpInit() {
         }
     }
 
-    bits = 1 << size;
 
     dpDivisions = new int *[size];
     for (int i = 0; i < size; i++) {
@@ -153,7 +160,11 @@ void Graph::dpInit() {
         }
     }
 }
-
+/**
+ * Funkcja rozpoczyna algorytm Dynamic Programming
+ * bits - jedynki na indeksie kazdego miasta (do wlasciwej funkcji przekazujemy 0 na miejscu wierzcholka startowego)
+ * do dpDivisions przekazujemy wartosci {1,2,3}, 0
+ */
 void Graph::startDynamicProgramming() {
     bits--;
 
@@ -164,44 +175,63 @@ void Graph::startDynamicProgramming() {
     cost = dynamicProgramming(0, bits - 1);
     dpCountPath(0, bits - 1);
 }
-
+/**
+ *
+ * @param nodeIndex - index wierzcholka startowego dla danego wywolania
+ * @param nodeBits - bity okreslajace sprawdzany podproblem dla danego wykonania
+ * @return cost - najniszy uzyskany koszt dla danego problemu
+ */
 int Graph::dynamicProgramming(int nodeIndex, int nodeBits) {
+    // zmienna lokalna, potrzebna do kontroli zapisania uzyskanego rozwiazania
     int result = -1;
-
+    // jezeli dany podproblem ma juz rozwiazanie, zwroc jego wynik
     if(dpDivisions[nodeIndex][nodeBits] != -1)
         return dpDivisions[nodeIndex][nodeBits];
 
     for (int i = 0; i < size; i++) {
+        //ustawia bit 0 na i-tym wierzcholku
         int mask = bits - (1 << i);
-
+        // bitowy AND miedzy poczatkowymi bitami a maska
         int masked = nodeBits & mask;
-
+        //jesli poprawnie wyznaczono nowe bity, przechodzimy dalej
         if(masked != nodeBits) {
+            // value - przechowuje koszt z wezla startowego do wezla i-tego + koszt od i-tego do pozostalych
             int value = dpTemp[nodeIndex][i] + dynamicProgramming(i, masked);
 
+            // jezeli nie ma jeszcze rozwiazania badz nowe jest lepsze, zapisz je
             if(result == -1 || value < result) {
                 result = value;
+                // przypisanie kolejnego wezla do macierzy przejsc
                 dpTrack[nodeIndex][nodeBits] = i;
             }
         }
     }
-
+    // przypisanie zapisanego rozwiazania do macierzy podproblemow
     dpDivisions[nodeIndex][nodeBits] = result;
     return result;
 }
-
+/**
+ * sluzy do odnalezienia i zapisania sciezki o najmniejszym koszcie
+ * @param nodeIndex - index wierzcholka startowego dla danego wywolania
+ * @param nodeBits - bity okreslajace sprawdzany podproblem dla danego wykonania
+ */
 void Graph::dpCountPath(int nodeIndex, int nodeBits) {
+    // dodanie wierzcholka poczatkowego
     path.push_back(0);
     int nextNode = dpTrack[nodeIndex][nodeBits];
 
+    // jezeli istnieje kolejny wezel
     while (nextNode != -1) {
         path.push_back(nextNode);
+        // ustawia 0 na indeksie odwiedzonego miasta
         int mask = bits - (1 << nextNode);
+        // wynikiem jest zbior miast nieodwiedzonych
         int masked = nodeBits & mask;
 
         nextNode = dpTrack[nextNode][masked];
         nodeBits = masked;
     }
+    // dodanie na koniec spowrotem wierzcholka startowego
     path.push_back(0);
 }
 
