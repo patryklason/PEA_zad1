@@ -16,10 +16,9 @@ void TimeTest::runTest(int iterations, int size, int algorithm) {
     QueryPerformanceFrequency((LARGE_INTEGER *)&frequency);
     long long int totalTime = 0;
 
-
+    Graph g;
     if(algorithm == 0) {
         for (int i = 0; i < iterations; ++i) {
-            Graph g;
             g.generateRandomMatrix(size);
 
             start = read_QPC();
@@ -30,10 +29,11 @@ void TimeTest::runTest(int iterations, int size, int algorithm) {
         }
     }
     else if(algorithm == 1){
+        g.generateRandomMatrix(size);
+        g.dpInit();
         for (int i = 0; i < iterations; ++i) {
-            Graph g;
             g.generateRandomMatrix(size);
-            g.dpInit();
+            g.dpResetValues();
 
             start = read_QPC();
             g.startDynamicProgramming();

@@ -45,17 +45,16 @@ bool mainMenu(Graph *g){
 int main() {
 
 
-    TimeTest timeTest;
-    timeTest.runTest(1000, 11, 1);
+    //TimeTest timeTest;
+    //timeTest.runTest(100, 6, 1);
     /*Graph g;
     if(!g.readFromFile("../tsp_13.txt"))
         cout << "Blad odczytu pliku!";
     else
         g.printMatrix();
-    cout << endl << endl;
-    */
-    //Graph g;
-    //while(mainMenu(&g));
-    //return 0;
+    cout << endl << endl;*/
+    Graph g;
+    while(mainMenu(&g));
+
     return 0;
 }

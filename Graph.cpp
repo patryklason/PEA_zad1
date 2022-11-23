@@ -6,7 +6,7 @@
 #include <vector>
 #include "Graph.h"
 #include "fstream"
-#include "time.h"
+#include "ctime"
 using namespace std;
 /**
  * Funkcja wczytuje macierz z pliku do reprezentacji macierzy wag w postaci dynamicznej tablicy dwuwymiarowej
@@ -69,6 +69,8 @@ void Graph::printMatrix() {
  * @param currPathValue - zmienna pomocnicza, przechowuje koszt dla danej iteracji
  */
 void Graph::bruteForce() {
+    path.clear();
+
     vector<int> permutation;
     vector<int> bestPath;
     int minPathValue = INT_MAX, currPathValue = 0;
@@ -109,7 +111,9 @@ void Graph::bruteForce() {
     cout << "0" << endl;*/
 
 }
-
+/**
+ * Funkcja inicjalizuje niezbędne dane do przeprowadzenia algorytmu Dynamic Programming
+**/
 void Graph::dpInit() {
     cost = 0;
     dpTemp = new int *[size];
@@ -150,6 +154,17 @@ void Graph::dpInit() {
     }
 }
 
+void Graph::startDynamicProgramming() {
+    bits--;
+
+    for(int i = 0; i < size; ++i) {
+        dpDivisions[i][0] = dpTemp[i][0];
+    }
+
+    cost = dynamicProgramming(0, bits - 1);
+    dpCountPath(0, bits - 1);
+}
+
 int Graph::dynamicProgramming(int nodeIndex, int nodeBits) {
     int result = -1;
 
@@ -177,29 +192,20 @@ int Graph::dynamicProgramming(int nodeIndex, int nodeBits) {
 
 void Graph::dpCountPath(int nodeIndex, int nodeBits) {
     path.push_back(0);
-    int x = dpTrack[nodeIndex][nodeBits];
+    int nextNode = dpTrack[nodeIndex][nodeBits];
 
-    while (x != -1) {
-        path.push_back(x);
-        int mask = bits - (1 << x);
+    while (nextNode != -1) {
+        path.push_back(nextNode);
+        int mask = bits - (1 << nextNode);
         int masked = nodeBits & mask;
 
-        x = dpTrack[x][masked];
+        nextNode = dpTrack[nextNode][masked];
         nodeBits = masked;
     }
     path.push_back(0);
 }
 
-void Graph::startDynamicProgramming() {
-    bits--;
 
-    for(int i = 0; i < size; ++i) {
-        dpDivisions[i][0] = dpTemp[i][0];
-    }
-
-    cost = dynamicProgramming(0, bits - 1);
-    dpCountPath(0, bits - 1);
-}
 
 void Graph::printResult() {
 
@@ -220,6 +226,7 @@ void Graph::printResult() {
     delete[] dpTemp;
     delete[] dpTrack;
     path.clear();
+    cost = 0;
 }
 
 Graph::Graph() {
@@ -237,6 +244,8 @@ Graph::~Graph() {
     delete[] dpTemp;
     delete[] dpTrack;
     delete[] matrix;*/
+    path.clear();
+    cost = 0;
 }
 
 void Graph::generateRandomMatrix(int userSize) {
@@ -257,6 +266,30 @@ void Graph::generateRandomMatrix(int userSize) {
                 matrix[i][j] = 0;
         }
 
+    }
+}
+
+void Graph::dpResetValues() {
+    cost = 0;
+    path.clear();
+    bits = 1 << size;
+
+    for (int i = 0; i < size; ++i) {
+        for (int j = 0; j < size; ++j) {
+            dpTemp[i][j] = matrix[i][j];
+        }
+    }
+
+    for (int i = 0; i < size; ++i) {
+        for (int j = 0; j < bits; ++j) {
+            dpDivisions[i][j] = -1;
+        }
+    }
+
+    for (int i = 0; i < size; ++i) {
+        for (int j = 0; j < bits; ++j) {
+            dpTrack[i][j] = -1;
+        }
     }
 }
 

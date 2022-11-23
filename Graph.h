@@ -10,43 +10,51 @@
 
 using namespace std;
 /**
- * Klasa odpowiedzialna za operacje na grafie
+ * Klasa odpowiedzialna za inicjalizacje oraz wykonanie algorytmow na grafie
  * @param size - ilosc miast
- * @param matrix - reprezentacja grafu w postaci tablicy dynamicznej prezentujacej macierz kosztow
+ * @param matrix - reprezentacja grafu w postaci tablicy dynamicznej, reprezentujacej macierz kosztow
+ * @param cost - uzyskany przez algorytm najnizszy koszt przejscia
+ * @param path - uzyskana przez algorytm sciezka o najnizszym koszcie przejscia
  *
+ * @param bits -
+ * @param dpTemp -
+ * @param dpDivisions -
+ * @param dpTrack -
  */
 class Graph {
 public:
     int size;
     int ** matrix;
 
-
-    void generateRandomMatrix(int userSize);
-
-    void dpInit();
-
-    void startDynamicProgramming();
-
-    bool readFromFile(string filename);
-    void printMatrix();
-    void bruteForce();
-
-    void printResult();
-
     Graph();
     ~Graph();
 
+    bool readFromFile(string filename);
+    void generateRandomMatrix(int userSize);
+    void printMatrix();
+    void printResult();
+
+    void bruteForce();
+
+    void dpInit();
+    void startDynamicProgramming();
+    void dpResetValues();
+
 private:
-    int dynamicProgramming(int nodeIndex, int nodeBits);
-    void dpCountPath(int nodeIndex, int nodeBits);
-
+    //Zmiennie wspolne
     int cost;
-
-    int ** dpTemp;
     vector<int> path;
+
+
+    //zmienne do DP
     int bits;
+    int ** dpTemp;
     int ** dpDivisions;
     int ** dpTrack;
+
+
+    int dynamicProgramming(int nodeIndex, int nodeBits);
+    void dpCountPath(int nodeIndex, int nodeBits);
 };
 
 
